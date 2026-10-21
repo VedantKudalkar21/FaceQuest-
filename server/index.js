@@ -18,11 +18,16 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: true },
 });
 
-app.use(cors({ origin: [
-  "http://localhost:5173",
-  "https://facequest.vercel.app",
- ]
+
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://facquest.vercel.app"
+  ],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/avatar", avatarRouter);
