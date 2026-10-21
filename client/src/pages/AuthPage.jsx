@@ -1,6 +1,8 @@
 
 import { useState } from "react";
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 export default function AuthPage({ onSuccess }) {
   const [mode, setMode] = useState("register");
   const [name, setName] = useState("");
@@ -53,7 +55,7 @@ export default function AuthPage({ onSuccess }) {
                 : { email: cleanEmail, password };
 
             const response = await fetch(
-            `http://localhost:5000${endpoint}`,
+            `${API_BASE}${endpoint}`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
