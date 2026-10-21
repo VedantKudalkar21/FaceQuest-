@@ -1,0 +1,309 @@
+
+.redeem-page {
+  min-height: 100vh;
+  padding: 32px clamp(16px, 5vw, 64px);
+  color: #edf4ff;
+  background:
+    radial-gradient(ellipse at 50% 0%, #30275a 0%, transparent 48%),
+    #090d19;
+}
+
+.redeem-header {
+  max-width: 1100px;
+  margin: 0 auto 30px;
+  position: relative;
+}
+
+.redeem-back {
+  display: block;
+  margin-bottom: 34px;
+  padding: 10px 14px;
+  border: 1px solid #65718c55;
+  border-radius: 10px;
+  background: #ffffff08;
+  color: inherit;
+  cursor: pointer;
+}
+
+.redeem-eyebrow {
+  color: #75e9f6;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+
+.redeem-header h1 {
+  margin: 12px 0;
+  font-size: clamp(38px, 6vw, 64px);
+  letter-spacing: -2px;
+}
+
+.redeem-header h1 span {
+  color: #a995ff;
+}
+
+.redeem-header > p {
+  color: #a8b4ca;
+  line-height: 1.7;
+}
+
+.redeem-wallet {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+  padding: 15px 20px;
+  border: 1px solid #8d7cff55;
+  border-radius: 15px;
+  background: #8d7cff12;
+}
+
+.redeem-wallet > span {
+  color: #75e9f6;
+  font-size: 30px;
+}
+
+.redeem-wallet div {
+  display: grid;
+  gap: 4px;
+}
+
+.redeem-wallet small {
+  color: #9eacc3;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+}
+
+.redeem-wallet strong {
+  font-size: 20px;
+}
+
+.redeem-tabs {
+  display: flex;
+  gap: 10px;
+  max-width: 1100px;
+  margin: 0 auto 24px;
+  border-bottom: 1px solid #ffffff1a;
+}
+
+.redeem-tabs button {
+  padding: 13px 17px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #aab5ca;
+  cursor: pointer;
+}
+
+.redeem-tabs button.active {
+  border-bottom-color: #75e9f6;
+  color: #75e9f6;
+}
+
+.redeem-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 235px), 1fr));
+  gap: 18px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.redeem-card {
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  border: 1px solid #8795b52b;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #1a2033, #111626);
+  transition: transform 180ms ease, border-color 180ms ease;
+}
+
+.redeem-card:hover {
+  transform: translateY(-4px);
+  border-color: #8c7cff88;
+}
+
+.redeem-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.redeem-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #9a85ff19;
+  font-size: 26px;
+}
+
+.redeem-cost {
+  color: #75e9f6;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.redeem-benefit {
+  margin-top: 24px;
+  color: #b5a5ff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.redeem-card h2,
+.owned-coupon h2 {
+  margin: 8px 0;
+  font-size: 19px;
+}
+
+.redeem-card p,
+.owned-coupon p {
+  color: #a7b2c7;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.redeem-buy,
+.redeem-empty button {
+  width: 100%;
+  margin-top: auto;
+  padding: 12px;
+  border: 1px solid #75e9f666;
+  border-radius: 10px;
+  background: #75e9f611;
+  color: #b9f8ff;
+  cursor: pointer;
+}
+
+.redeem-buy {
+  margin-top: 22px;
+}
+
+.redeem-buy:disabled {
+  border-color: #ffffff15;
+  background: #ffffff08;
+  color: #8c99ae;
+  cursor: default;
+}
+
+.redeem-notice,
+.redeem-error {
+  max-width: 1100px;
+  margin: 0 auto 18px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  line-height: 1.5;
+}
+
+.redeem-notice {
+  border: 1px solid #75e9f644;
+  background: #75e9f60d;
+}
+
+.redeem-error {
+  border: 1px solid #ff858544;
+  background: #ff858510;
+  color: #ffb5b5;
+}
+
+.owned-coupons {
+  display: grid;
+  gap: 14px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.owned-coupon {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid #8795b52b;
+  border-radius: 16px;
+  background: #171d2d;
+}
+
+.owned-coupon-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.owned-coupon-info > span {
+  color: #75e9f6;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.owned-coupon-info code {
+  display: inline-block;
+  margin: 7px 0;
+  padding: 8px 10px;
+  border: 1px dashed #a995ff88;
+  border-radius: 8px;
+  color: #d6ccff;
+  overflow-wrap: anywhere;
+}
+
+.owned-coupon-info small {
+  display: block;
+  color: #98a5ba;
+  font-size: 11px;
+}
+
+.owned-coupon > button {
+  padding: 10px 13px;
+  border: 1px solid #8d7cff66;
+  border-radius: 9px;
+  background: #8d7cff18;
+  color: #e5deff;
+  cursor: pointer;
+}
+
+.redeem-empty {
+  padding: 50px 20px;
+  border: 1px dashed #8795b544;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.redeem-empty > span {
+  font-size: 38px;
+}
+
+.redeem-empty p {
+  color: #a7b2c7;
+}
+
+.redeem-empty button {
+  width: auto;
+  margin-top: 12px;
+}
+
+.redeem-disclaimer {
+  max-width: 1100px;
+  margin: 35px auto 0;
+  color: #8491a9;
+  font-size: 11px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .owned-coupon {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .owned-coupon-info {
+    flex-basis: calc(100% - 70px);
+  }
+
+  .owned-coupon > button {
+    margin-left: auto;
+  }
+}

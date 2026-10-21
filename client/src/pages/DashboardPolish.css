@@ -1,0 +1,683 @@
+
+/* FACEQUEST — Dashboard UI polish */
+
+.sci-dashboard {
+  --ui-cyan: #5cecff;
+  --ui-panel: #101a2b;
+  --ui-border: rgba(92, 236, 255, 0.2);
+  --ui-muted: #91a4bc;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(37, 91, 155, .15), transparent 35%),
+    #080c16;
+  color: #edf7ff;
+  min-height: 100vh;
+}
+
+.sci-dashboard button,
+.sci-dashboard a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sci-dashboard button {
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease,
+    color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+.sci-dashboard button:focus-visible,
+.sci-dashboard a:focus-visible {
+  outline: 2px solid var(--ui-cyan);
+  outline-offset: 4px;
+}
+
+/* Header and navigation */
+
+.sci-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(7, 11, 20, .92);
+  border-bottom: 1px solid var(--ui-border);
+  backdrop-filter: blur(16px);
+}
+
+.sci-back,
+.sci-account-button {
+  min-height: 44px;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  background: rgba(17, 27, 44, .9);
+  color: #edf7ff;
+}
+
+.sci-back:hover,
+.sci-account-button:hover,
+.sci-account-button[aria-expanded="true"] {
+  border-color: var(--ui-cyan);
+  background: rgba(92, 236, 255, .1);
+}
+
+.sci-account { position: relative; }
+
+.sci-account-menu {
+  z-index: 50;
+  width: min(320px, calc(100vw - 24px));
+  padding: 10px;
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  background: rgba(9, 15, 27, .98);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .45);
+  backdrop-filter: blur(16px);
+}
+
+.sci-account-details {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--ui-border);
+  overflow-wrap: anywhere;
+}
+
+.sci-account-details > span {
+  color: var(--ui-muted);
+  font-size: .82rem;
+}
+
+.sci-account-avatar-link,
+.sci-account-logout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #edf7ff;
+  text-align: left;
+}
+
+.sci-account-avatar-link > span:nth-child(2) {
+  flex: 1;
+}
+
+.sci-account-avatar-link small {
+  display: block;
+  margin-top: 3px;
+  color: var(--ui-muted);
+}
+
+.sci-account-avatar-link:hover {
+  border-color: var(--ui-border);
+  background: rgba(92, 236, 255, .08);
+}
+
+.sci-account-logout {
+  margin-top: 5px;
+  color: #ff9ba8;
+}
+
+.sci-account-logout:hover {
+  background: rgba(255, 100, 125, .1);
+  border-color: rgba(255, 100, 125, .35);
+}
+
+/* Welcome section */
+
+.sci-welcome h1 {
+  line-height: .98;
+  letter-spacing: -.045em;
+}
+
+.sci-welcome h1 span {
+  color: var(--ui-cyan);
+  text-shadow: 0 0 28px rgba(92, 236, 255, .12);
+}
+
+.sci-welcome p,
+.sci-featured-info p,
+.sci-mission-card p {
+  color: var(--ui-muted);
+  line-height: 1.75;
+}
+
+/* Stat cards */
+
+.sci-stats {
+  gap: 14px;
+}
+
+.sci-stat {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  border-radius: 3px 14px 3px 14px;
+  background: linear-gradient(145deg, #131e31, #0b111d);
+  transition: transform .2s ease, border-color .2s ease;
+}
+
+.sci-stat:hover {
+  transform: translateY(-3px);
+  border-color: rgba(92, 236, 255, .55);
+}
+
+.sci-stat-symbol {
+  color: var(--ui-cyan);
+}
+
+.sci-stat > strong {
+  font-variant-numeric: tabular-nums;
+}
+
+/* XP progress */
+
+.sci-progress-panel,
+.sci-capture-launch,
+.sci-featured,
+.sci-mission-card,
+.sci-collection {
+  border: 1px solid var(--ui-border);
+  background: linear-gradient(145deg, #111b2c, #0b111d);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, .12);
+}
+
+.sci-progress-track {
+  overflow: hidden;
+  border-radius: 999px;
+  background: #050a13;
+}
+
+.sci-progress-fill {
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22bad5, #72f4ff);
+  box-shadow: 0 0 18px rgba(92, 236, 255, .3);
+  transition: width .45s ease;
+}
+
+.sci-xp-number strong {
+  color: var(--ui-cyan);
+}
+
+/* Main action buttons */
+
+.sci-capture-button,
+.sci-primary-button {
+  min-height: 46px;
+  padding: 12px 18px;
+  border: 1px solid var(--ui-cyan);
+  border-radius: 9px;
+  background: linear-gradient(135deg, #65edff, #30c5e0);
+  color: #04111b;
+  font-weight: 800;
+}
+
+.sci-capture-button:hover,
+.sci-primary-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(43, 198, 222, .2);
+  filter: brightness(1.06);
+}
+
+.sci-secondary-button {
+  min-height: 44px;
+  padding: 11px 14px;
+  border: 1px solid rgba(92, 236, 255, .3);
+  border-radius: 9px;
+  background: rgba(92, 236, 255, .055);
+  color: #edf7ff;
+  font-weight: 700;
+}
+
+.sci-secondary-button:hover {
+  transform: translateY(-2px);
+  border-color: var(--ui-cyan);
+  background: rgba(92, 236, 255, .12);
+  color: var(--ui-cyan);
+}
+
+.sci-capture-button:active,
+.sci-primary-button:active,
+.sci-secondary-button:active,
+.sci-back:active {
+  transform: scale(.985);
+}
+
+/* Mission cards */
+
+.sci-mission-card {
+  min-width: 0;
+  border-radius: 3px 14px 3px 14px;
+  transition: transform .22s ease, border-color .22s ease,
+    box-shadow .22s ease;
+}
+
+.sci-mission-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(92, 236, 255, .5);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, .24);
+}
+
+.sci-mission-icon {
+  border: 1px solid var(--ui-border);
+  border-radius: 11px;
+  background: rgba(92, 236, 255, .1);
+  color: var(--ui-cyan);
+}
+
+.sci-mission-world {
+  color: var(--ui-cyan);
+}
+
+.sci-card-tags span,
+.sci-featured-meta span {
+  border: 1px solid var(--ui-border);
+  border-radius: 7px;
+  background: rgba(92, 236, 255, .045);
+}
+
+.sci-mission-reward {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+
+.sci-notice {
+  padding: 14px 16px;
+  border: 1px solid rgba(87, 220, 158, .3);
+  border-radius: 10px;
+  background: rgba(87, 220, 158, .08);
+  color: #a6f5ca;
+  line-height: 1.6;
+}
+
+.sci-reward-chip {
+  border: 1px solid var(--ui-border);
+  border-radius: 9px;
+  background: rgba(92, 236, 255, .06);
+}
+
+/* Responsive layout */
+
+@media (max-width: 900px) {
+  .sci-header {
+    position: relative;
+  }
+
+  .sci-capture-launch {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 620px) {
+  .sci-header {
+    gap: 10px;
+    padding-inline: 12px;
+  }
+
+  .sci-account-label {
+    display: none;
+  }
+
+  .sci-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .sci-stat {
+    padding: 14px 12px;
+  }
+
+  .sci-mission-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sci-capture-launch {
+    align-items: flex-start;
+  }
+
+  .sci-capture-button {
+    width: 100%;
+  }
+
+  .sci-section-heading {
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sci-dashboard *,
+  .sci-dashboard *::before,
+  .sci-dashboard *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+
+/* FIX: Keep the dashboard header aligned in one row */
+
+.sci-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+  min-height: 88px;
+  padding: 12px clamp(20px, 4.5vw, 68px);
+}
+
+.sci-header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.sci-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-height: 38px;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.sci-online {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-size: 10px;
+}
+
+.sci-logo {
+  grid-column: 2;
+  justify-self: center;
+  align-self: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sci-header-right {
+  grid-column: 3;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.sci-account {
+  position: relative;
+}
+
+.sci-account-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 7px 12px;
+  white-space: nowrap;
+}
+
+.sci-account-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  text-align: left;
+}
+
+.sci-account-label strong {
+  line-height: 1.2;
+}
+
+.sci-account-label small {
+  line-height: 1.2;
+}
+
+.sci-account-chevron {
+  flex-shrink: 0;
+}
+
+/* Smaller screens */
+@media (max-width: 620px) {
+  .sci-header {
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    min-height: 82px;
+    padding: 12px 14px;
+  }
+
+  .sci-header-left {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .sci-logo {
+    display: none;
+  }
+
+  .sci-header-right {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .sci-account-label {
+    display: flex;
+  }
+
+  .sci-account-button {
+    gap: 7px;
+    padding: 6px 8px;
+  }
+
+  .sci-account-label strong {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (max-width: 380px) {
+  .sci-account-label {
+    display: none;
+  }
+}
+
+
+.fq-reward-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(3, 8, 24, 0.82);
+  backdrop-filter: blur(8px);
+}
+
+.fq-reward-modal {
+  width: min(100%, 430px);
+  padding: 32px 24px;
+  border: 1px solid rgba(107, 232, 255, 0.4);
+  border-radius: 22px;
+  background: #10172c;
+  color: #f5f7ff;
+  text-align: center;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
+}
+
+.fq-reward-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.fq-reward-kicker {
+  color: #72e8ff;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.fq-reward-modal h2 {
+  margin: 12px 0;
+}
+
+.fq-reward-amount {
+  margin: 22px 0;
+  font-size: 36px;
+  font-weight: 800;
+  color: #7df7bd;
+}
+
+.fq-reward-code {
+  padding: 14px;
+  margin: 20px 0;
+  border: 1px dashed #72e8ff;
+  border-radius: 10px;
+  color: #72e8ff;
+  font-size: 24px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.fq-reward-modal button {
+  width: 100%;
+  padding: 14px;
+  border: 0;
+  border-radius: 10px;
+  background: #72e8ff;
+  color: #081226;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.fq-reward-modal button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.fq-reward-modal .fq-reward-secondary {
+  margin-top: 12px;
+  border: 1px solid #56617b;
+  background: transparent;
+  color: #f5f7ff;
+}
+
+
+.fq-referral-panel {
+  margin: 24px 0;
+  padding: 24px;
+  border: 1px solid rgba(100, 200, 255, 0.35);
+  border-radius: 16px;
+  background: rgba(10, 25, 50, 0.85);
+  color: #fff;
+}
+
+.fq-referral-panel h2 {
+  margin-top: 0;
+}
+
+.fq-referral-code {
+  margin: 16px 0;
+  padding: 12px;
+  border: 1px dashed rgba(100, 200, 255, 0.6);
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  overflow-wrap: anywhere;
+}
+
+.fq-referral-panel button {
+  margin: 6px 8px 6px 0;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+
+.fq-weekly-rewards {
+  margin: 24px 0;
+  padding: 24px;
+  border: 1px solid rgba(100, 200, 255, 0.35);
+  border-radius: 16px;
+  background: rgba(10, 25, 50, 0.85);
+  color: #fff;
+}
+
+.fq-week-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.fq-week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 8px;
+  border: 1px solid rgba(150, 170, 200, 0.25);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.fq-week-day.is-complete {
+  border-color: #58d6a5;
+  background: rgba(50, 200, 140, 0.12);
+}
+
+.fq-week-day span {
+  font-size: 24px;
+}
+
+.fq-week-day small {
+  opacity: 0.8;
+}
+
+.fq-weekly-rewards button {
+  margin: 6px 8px 6px 0;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.fq-weekly-rewards button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (max-width: 600px) {
+  .fq-week-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+
+.sci-header {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  min-height: 80px;
+  box-sizing: border-box;
+}
+
+.sci-header-left {
+  align-self: center;
+}
+
+.sci-back {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 1;
+}

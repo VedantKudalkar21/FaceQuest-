@@ -1,0 +1,407 @@
+/* FACEQUEST — Cosmic Adventure Landing Page */
+
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  color: #f5f3ff;
+  background: #080916;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app,
+.app * {
+  box-sizing: border-box;
+}
+
+.app {
+  --fq-purple: #9b72ff;
+  --fq-cyan: #64e8ff;
+  --fq-muted: #a6acc8;
+
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow: hidden;
+  padding: 0 clamp(22px, 7vw, 110px);
+  color: #f5f3ff;
+  background:
+    radial-gradient(ellipse at 78% 34%, rgba(101, 57, 191, 0.2), transparent 34%),
+    radial-gradient(ellipse at 12% 78%, rgba(38, 128, 181, 0.12), transparent 32%),
+    #080916;
+}
+
+.app::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  opacity: 0.38;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, #ffffff 99%, transparent),
+    radial-gradient(1px 1px at 29% 67%, #b7a1ff 99%, transparent),
+    radial-gradient(2px 2px at 81% 14%, #ffffff 99%, transparent),
+    radial-gradient(1px 1px at 91% 58%, #8ceaff 99%, transparent),
+    radial-gradient(1.5px 1.5px at 67% 83%, #ffffff 99%, transparent),
+    radial-gradient(1px 1px at 44% 29%, #c5b5ff 99%, transparent);
+  background-size: 260px 240px, 310px 290px, 370px 320px,
+    280px 270px, 350px 330px, 290px 280px;
+  animation: fq-twinkle 8s ease-in-out infinite alternate;
+}
+
+.app::after {
+  position: absolute;
+  z-index: -1;
+  top: 190px;
+  right: -170px;
+  width: 480px;
+  height: 480px;
+  border: 1px solid rgba(168, 130, 255, 0.15);
+  border-radius: 50%;
+  content: "";
+  box-shadow:
+    0 0 80px rgba(127, 80, 255, 0.08),
+    inset 0 0 80px rgba(127, 80, 255, 0.06);
+  pointer-events: none;
+}
+
+.navbar {
+  min-height: 94px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid rgba(180, 173, 255, 0.12);
+  animation: fq-fade-down 0.7s ease both;
+}
+
+.logo {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-decoration: none;
+}
+
+.logo span {
+  color: var(--fq-purple);
+}
+
+.nav-label {
+  padding: 9px 14px;
+  border: 1px solid rgba(169, 140, 255, 0.22);
+  border-radius: 999px;
+  color: #c8b7ff;
+  background: rgba(126, 88, 211, 0.08);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.hero {
+  position: relative;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(75px, 11vh, 120px) 0 45px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 14px;
+  border: 1px solid rgba(156, 119, 255, 0.27);
+  border-radius: 999px;
+  color: #d4c4ff;
+  background: rgba(112, 76, 187, 0.1);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  animation: fq-fade-up 0.7s 0.1s ease both;
+}
+
+.hero h1 {
+  max-width: 850px;
+  margin: 30px 0 22px;
+  color: #fff;
+  font-size: clamp(46px, 7.5vw, 88px);
+  font-weight: 900;
+  line-height: 1.06;
+  letter-spacing: -4px;
+  animation: fq-fade-up 0.8s 0.2s ease both;
+}
+
+.hero h1 span {
+  color: transparent;
+  background: linear-gradient(100deg, #c3a7ff 5%, #9e83ff 42%, #6be8ff 95%);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.description {
+  max-width: 620px;
+  margin: 0 0 32px;
+  color: var(--fq-muted);
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.9;
+  animation: fq-fade-up 0.8s 0.3s ease both;
+}
+
+.start-button {
+  position: relative;
+  display: inline-flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 25px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(105deg, #8253ee, #6543d4);
+  box-shadow: 0 8px 30px rgba(112, 72, 224, 0.25);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease,
+    filter 0.25s ease;
+  animation: fq-fade-up 0.8s 0.4s ease both;
+}
+
+.start-button:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.12);
+  box-shadow: 0 12px 38px rgba(133, 89, 255, 0.42);
+}
+
+.start-button:active {
+  transform: translateY(0);
+}
+
+.start-button:focus-visible {
+  outline: 2px solid var(--fq-cyan);
+  outline-offset: 4px;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: clamp(65px, 10vh, 105px);
+  animation: fq-fade-up 0.8s 0.5s ease both;
+}
+
+.feature {
+  position: relative;
+  min-height: 174px;
+  padding: 25px;
+  overflow: hidden;
+  border: 1px solid rgba(177, 170, 255, 0.13);
+  border-radius: 18px;
+  background: linear-gradient(
+    145deg,
+    rgba(30, 29, 59, 0.76),
+    rgba(15, 17, 36, 0.82)
+  );
+  backdrop-filter: blur(12px);
+  transition: transform 0.3s ease, border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+.feature::after {
+  position: absolute;
+  top: -35px;
+  right: -35px;
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  background: rgba(148, 108, 255, 0.1);
+  content: "";
+  filter: blur(4px);
+  transition: transform 0.4s ease;
+}
+
+.feature:hover {
+  transform: translateY(-6px);
+  border-color: rgba(159, 125, 255, 0.45);
+  background: linear-gradient(
+    145deg,
+    rgba(40, 34, 76, 0.88),
+    rgba(17, 21, 43, 0.92)
+  );
+}
+
+.feature:hover::after {
+  transform: scale(1.6);
+}
+
+.feature > span {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--fq-cyan);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.feature h3 {
+  margin: 0 0 9px;
+  color: #f7f5ff;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.feature p {
+  margin: 0;
+  color: #a6acc8;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Loading and error screens from App.jsx */
+
+.app-loading {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  color: #f5f3ff;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(111, 70, 210, 0.2), transparent 45%),
+    #080916;
+  text-align: center;
+}
+
+.app-loading h2 {
+  margin: 0;
+}
+
+.app-loading p {
+  max-width: 520px;
+  color: #b6bbd3;
+  line-height: 1.7;
+}
+
+.avatar-back-button {
+  padding: 12px 20px;
+  border: 1px solid rgba(180, 173, 255, 0.25);
+  border-radius: 10px;
+  color: #f5f3ff;
+  background: #17172d;
+  cursor: pointer;
+}
+
+@keyframes fq-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fq-fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fq-twinkle {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 0.55;
+  }
+}
+
+@media (min-width: 1400px) {
+  .hero {
+    padding-top: 125px;
+  }
+
+  .features {
+    margin-top: 100px;
+  }
+}
+
+@media (max-width: 700px) {
+  .app {
+    padding-right: 22px;
+    padding-left: 22px;
+  }
+
+  .navbar {
+    min-height: 76px;
+  }
+
+  .logo {
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+
+  .nav-label {
+    padding: 8px 10px;
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .hero {
+    padding-top: 76px;
+  }
+
+  .hero h1 {
+    margin-top: 25px;
+    font-size: clamp(43px, 11vw, 65px);
+    letter-spacing: -2.5px;
+  }
+
+  .description {
+    font-size: 15px;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 65px;
+  }
+
+  .feature {
+    min-height: 0;
+    padding: 22px;
+  }
+
+  .feature > span {
+    margin-bottom: 12px;
+  }
+
+  .app::after {
+    top: 280px;
+    right: -320px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app *,
+  .app *::before,
+  .app *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
