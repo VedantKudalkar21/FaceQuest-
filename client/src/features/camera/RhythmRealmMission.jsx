@@ -1,4 +1,4 @@
-
+import MissionPhotoSave from "./MissionPhotoSave";
 import { useEffect, useRef, useState } from "react";
 import { FaceDetector, FilesetResolver } from "@mediapipe/tasks-vision";
 
@@ -364,8 +364,7 @@ export default function RhythmRealmMission({ onBack, onComplete }) {
               <p className="rhythm-note">
                 Tap the beat during the glow. Three successful hits in a row
                 capture a frame and advance the song. Face detection checks
-                visibility, not musical timing or eye gaze. Captures stay in
-                browser memory and are not uploaded.
+                visibility, not musical timing or eye gaze. Captured photos stay in your browser during the mission. At the end, you can choose to save them to your FaceQuest account.
               </p>
 
               <label className="rhythm-consent">
@@ -412,12 +411,12 @@ export default function RhythmRealmMission({ onBack, onComplete }) {
           </div>
 
           {finished && (
-            <button
-              className="rhythm-primary"
-              onClick={() => onComplete?.(reward)}
-            >
-              CLAIM {reward} XP →
-            </button>
+            <MissionPhotoSave
+              captures={captures}
+              mission="rhythm-realm"
+              reward={reward}
+              onComplete={onComplete}
+            />
           )}
         </aside>
       </div>

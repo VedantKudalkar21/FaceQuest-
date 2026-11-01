@@ -1,4 +1,4 @@
-
+import MissionPhotoSave from "./MissionPhotoSave";
 import { useEffect, useRef, useState } from "react";
 import { FaceDetector, FilesetResolver } from "@mediapipe/tasks-vision";
 
@@ -316,8 +316,7 @@ export default function StarshipMission({ onBack, onComplete }) {
             <>
               <p className="starship-note">
                 Face position controls the ship. At each gate, hold the required
-                position for two seconds to capture a frame. Images remain in
-                browser memory and are not uploaded. Eye gaze is not measured.
+                position for two seconds to capture a frame. Captured photos stay in your browser during the mission. At the end, you can choose to save them to your FaceQuest account. Eye gaze is not measured.
               </p>
               <label className="starship-consent">
                 <input
@@ -353,12 +352,12 @@ export default function StarshipMission({ onBack, onComplete }) {
           </div>
 
           {finished && (
-            <button
-              className="starship-start"
-              onClick={() => onComplete?.(reward)}
-            >
-              CLAIM {reward} XP →
-            </button>
+            <MissionPhotoSave
+              captures={captures}
+              mission="starship"
+              reward={reward}
+              onComplete={onComplete}
+            />
           )}
         </aside>
       </div>

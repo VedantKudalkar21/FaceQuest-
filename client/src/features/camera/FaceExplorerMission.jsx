@@ -1,4 +1,4 @@
-
+import MissionPhotoSave from "./MissionPhotoSave";
 import { useEffect, useRef, useState } from "react";
 import { FaceDetector, FilesetResolver } from "@mediapipe/tasks-vision";
 
@@ -121,11 +121,6 @@ export default function FaceExplorerMission({ onBack, onComplete }) {
     }
   }
 
-  function finishMission() {
-    // Images remain in memory and are not uploaded or persisted.
-    onComplete?.(nextXP);
-  }
-
   const nextXP = STEPS.length * 50;
 
   return (
@@ -167,7 +162,7 @@ export default function FaceExplorerMission({ onBack, onComplete }) {
                 <p>
                   This demo checks for a face in each captured frame.
                   It does not verify the requested angle or identify you.
-                  Images stay in browser memory and are not uploaded.
+                  Captured photos stay in your browser during the mission. At the end, you can choose to save them to your FaceQuest account.
                 </p>
                 <label className="camera-consent-check">
                   <input
@@ -248,15 +243,18 @@ export default function FaceExplorerMission({ onBack, onComplete }) {
               verified by this prototype.
             </p>
             <p><strong>Reward: {nextXP} XP</strong></p>
-            <button className="camera-primary-button" onClick={finishMission}>
-              CLAIM {nextXP} XP →
-            </button>
+            <MissionPhotoSave
+              captures={captures}
+              mission="face-explorer"
+              reward={nextXP}
+              onComplete={onComplete}
+            />
           </section>
         )}
 
         {error && <div className="camera-error" role="alert">{error}</div>}
         <p className="camera-privacy-note">
-          CAMERA ACCESS REQUIRES PERMISSION · IMAGES ARE NOT UPLOADED
+          CAMERA ACCESS REQUIRES PERMISSION · PHOTOS UPLOAD ONLY WHEN YOU CHOOSE TO SAVE
         </p>
       </section>
     </main>

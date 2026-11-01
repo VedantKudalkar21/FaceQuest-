@@ -6,6 +6,7 @@ import pg from "pg";
 import { testDatabase } from "./db.js";
 import authRoutes from "./routes/auth.js";
 import avatarRouter from "./routes/avatar.js";
+import imageRoutes from "./routes/images.js";
 
 dotenv.config();
 
@@ -28,9 +29,10 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: "4300kb" }));
 app.use("/api/auth", authRoutes);
 app.use("/api/avatar", avatarRouter);
+app.use("/api/images", imageRoutes);
 
 app.get("/api/health", async (req, res) => {
   try {

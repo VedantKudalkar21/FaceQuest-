@@ -8,11 +8,12 @@ import StarshipMission from "../features/camera/StarshipMission";
 import LostPortraitsMission from "../features/camera/LostPortraitsMission";
 import RhythmRealmMission from "../features/camera/RhythmRealmMission";
 import AvatarStudio from "../features/avatar/AvatarStudio";
-import RedeemStore from "../features/avatar/RedeemStore";
 import "./DashboardPolish.css";
 import FrontierExplorer from "../features/games/FrontierExplorer";
 import PortalRestoration from "../features/games/PortalRestoration";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import GalleryPage from "../features/gallery/GalleryPage";
+import RedeemStore from "../features/rewards/RedeemStore";
 
 const initialMissions = [
   {
@@ -21,7 +22,7 @@ const initialMissions = [
     world: "The Lost Temple",
     description:
       "Decode an ancient signal and recover the energy crystal hidden inside the temple.",
-    xp: 100,
+    xp: 300,
     reward: "Crystal Key",
     icon: "◇",
     difficulty: "EASY",
@@ -55,7 +56,8 @@ const initialMissions = [
     id: 4,
     title: "Light Seeker",
     world: "The Solar Spire",
-    description: "Capture a clear image with balanced lighting to calibrate optical sensors.",
+    description:
+      "Capture a clear image with balanced lighting to calibrate optical sensors.",
     xp: 200,
     reward: "Radiant Crystal",
     icon: "☀",
@@ -121,7 +123,8 @@ const initialMissions = [
     id: 10,
     title: "The Lost Portraits",
     world: "The Royal Archive",
-    description: "Restore five magical portraits with guided camera challenges.",
+    description:
+      "Restore five magical portraits with guided camera challenges.",
     xp: 250,
     reward: "Royal Portrait Badge",
     icon: "🖼️",
@@ -141,6 +144,91 @@ const initialMissions = [
   },
 ];
 
+function MissionSymbol({ id }) {
+  const paths = {
+    1: (
+      <>
+        <path d="m12 3 8 9-8 9-8-9 8-9Z" />
+        <path d="m12 7 4 5-4 5-4-5 4-5Z" />
+      </>
+    ),
+    2: (
+      <>
+        <circle cx="12" cy="12" r="8" />
+        <path d="m16 8-2.5 5.5L8 16l2.5-5.5L16 8Z" />
+      </>
+    ),
+    3: (
+      <>
+        <path d="M6 21V9a6 6 0 0 1 12 0v12H6Z" />
+        <path d="M9 21V9a3 3 0 0 1 6 0v12M4 21h16" />
+      </>
+    ),
+    4: (
+      <>
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2" />
+      </>
+    ),
+    5: (
+      <>
+        <rect x="4" y="6" width="16" height="14" rx="3" />
+        <circle cx="12" cy="13" r="4" />
+        <path d="m8 6 2-3h4l2 3" />
+      </>
+    ),
+    6: (
+      <>
+        <path d="M3 18h18M4 18V9m16 9V9M4 10q8 8 16 0M8 13v5m4-3v3m4-5v5" />
+      </>
+    ),
+    7: (
+      <>
+        <path d="M2 12q10-13 20 0-10 13-20 0Z" />
+        <circle cx="12" cy="12" r="3" />
+      </>
+    ),
+    8: (
+      <>
+        <path d="M3 3h18v18H3V3Zm4 0v10h6v4h8M7 7h10v6M3 17h6m4 4v-4" />
+      </>
+    ),
+    9: (
+      <>
+        <path d="m12 3 5 10-5-2-5 2 5-10Zm0 8v10M3 7l2 2m14 7 2 2M3 19h3m13-15h2" />
+      </>
+    ),
+    10: (
+      <>
+        <rect x="4" y="3" width="16" height="18" rx="2" />
+        <circle cx="12" cy="9" r="3" />
+        <path d="M7 18v-2a5 5 0 0 1 10 0v2" />
+      </>
+    ),
+    11: (
+      <>
+        <path d="M9 18V5l10-2v13M9 8l10-2" />
+        <ellipse cx="6" cy="18" rx="3" ry="2" />
+        <ellipse cx="16" cy="16" rx="3" ry="2" />
+      </>
+    ),
+  };
+  return (
+    <svg
+      className="fq-mission-symbol"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[id] || paths[1]}
+    </svg>
+  );
+}
+
 export default function DashboardPage({
   playerId,
   playerName = "Explorer",
@@ -150,29 +238,26 @@ export default function DashboardPage({
   onLogout,
   onBack,
 }) {
-  const accountKey = String(
-    playerId || playerEmail || "guest"
-  ).toLowerCase();
-
-  const progressKey = `facequest-progress-${accountKey}`;
-
-  const getToday = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-  };
+  const accountKey = String(playerId || playerEmail || "guest").toLowerCase();
 
   const [missions, setMissions] = useState(initialMissions);
   const [xp, setXp] = useState(0);
+  const [availableXP, setAvailableXP] = useState(0);
+  const [progressError, setProgressError] = useState("");
+  const [pendingClaims, setPendingClaims] = useState([]);
+  const [claimingRewards, setClaimingRewards] = useState(false);
+  const pendingRef = useRef([]);
+  const draining = useRef(false);
+  const alive = useRef(false);
+  const pendingKey = `facequest-pending-claims-${accountKey}`;
   const [rewards, setRewards] = useState([]);
   const [notice, setNotice] = useState("");
   const [showCamera, setShowCamera] = useState(false);
   const [activeCameraMission, setActiveCameraMission] = useState(null);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const accountMenuRef = useRef(null);
+  const accountButtonRef = useRef(null);
   const [showCrystalPuzzle, setShowCrystalPuzzle] = useState(false);
   const [activeGameMission, setActiveGameMission] = useState(null);
   const [showFaceExplorer, setShowFaceExplorer] = useState(false);
@@ -190,8 +275,11 @@ export default function DashboardPage({
   const [dailyRewardError, setDailyRewardError] = useState("");
   const [showFrontierExplorer, setShowFrontierExplorer] = useState(false);
   const [showPortalRestoration, setShowPortalRestoration] = useState(false);
-  
-  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const [showGallery, setShowGallery] = useState(false);
+
+  const API_BASE = (
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
+  ).replace(/\/+$/, "");
 
   const [showDailyReward, setShowDailyReward] = useState(false);
   const [showReferral, setShowReferral] = useState(false);
@@ -201,86 +289,174 @@ export default function DashboardPage({
   const [referralCode, setReferralCode] = useState("");
   const [rewardClaimed, setRewardClaimed] = useState(false);
 
-
-  
   useEffect(() => {
+    if (!profileOpen) return;
+    function dismiss(event) {
+      if (!accountMenuRef.current?.contains(event.target)) setProfileOpen(false);
+    }
+    function escape(event) {
+      if (event.key === "Escape") {
+        setProfileOpen(false);
+        accountButtonRef.current?.focus();
+      }
+    }
+    document.addEventListener("pointerdown", dismiss);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", dismiss);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [profileOpen]);
+
+  function applyWallet(wallet) {
+    setXp(wallet.totalXP);
+    setAvailableXP(wallet.availableXP);
+  }
+
+  function applyProgress(data) {
+    applyWallet(data.wallet);
+    setRewards(data.rewards);
+    setMissions(
+      initialMissions.filter(
+        (mission) => !data.completedMissionIds.includes(mission.id),
+      ),
+    );
+    setProgressLoaded(true);
+  }
+
+  async function progressRequest(
+    path = "/progress",
+    body,
+    token = localStorage.getItem("facequest-token"),
+  ) {
+    const response = await fetch(`${API_BASE}/api/avatar${path}`, {
+      method: body ? "POST" : "GET",
+      signal: AbortSignal.timeout(60000),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...(body ? { "Content-Type": "application/json" } : {}),
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok)
+      throw new Error(data.message || "Could not sync your XP. Please retry.");
+    if (!data.wallet || !Array.isArray(data.completedMissionIds))
+      throw new Error(
+        "Update the avatar backend and run avatar_shop.sql first.",
+      );
+    return data;
+  }
+
+  async function refreshProgress() {
     try {
-      const saved = localStorage.getItem(progressKey);
-
-      if (saved) {
-        const savedProgress = JSON.parse(saved);
-
-        if (
-          typeof savedProgress.xp === "number" &&
-          savedProgress.xp >= 0
-        ) {
-          setXp(savedProgress.xp);
-        }
-
-        if (
-          Array.isArray(savedProgress.rewards) &&
-          savedProgress.rewards.every(
-            (reward) => typeof reward === "string"
-          )
-        ) {
-          setRewards(savedProgress.rewards);
-        }
-
-        if (savedProgress.lastMissionDate === getToday()) {
-          if (Array.isArray(savedProgress.missions)) {
-            setMissions(savedProgress.missions);
-          } else {
-            setMissions(initialMissions);
-          }
-        } else {
-          setMissions(initialMissions);
-        }
-      } else {
-        setXp(0);
-        setRewards([]);
-        setMissions(initialMissions);
+      const data = await progressRequest();
+      if (alive.current) {
+        applyProgress(data);
+        setProgressError("");
       }
     } catch (error) {
-      console.error("Could not load FaceQuest progress:", error);
-      setXp(0);
-      setRewards([]);
-      setMissions(initialMissions);
-    } finally {
-      setProgressLoaded(true);
+      if (alive.current) setProgressError(error.message);
     }
-  }, [progressKey]);
+  }
 
-  
+  function savePending(ids) {
+    pendingRef.current = ids;
+    setPendingClaims(ids);
+    try {
+      localStorage.setItem(pendingKey, JSON.stringify(ids));
+    } catch {
+      setProgressError(
+        "Keep this page open until your pending reward is synced.",
+      );
+    }
+  }
+
+  async function drainClaims() {
+    if (draining.current || !alive.current) return;
+    draining.current = true;
+    setClaimingRewards(true);
+    const token = localStorage.getItem("facequest-token");
+    try {
+      while (pendingRef.current.length && alive.current) {
+        const id = pendingRef.current[0];
+        const data = await progressRequest(
+          "/mission-reward",
+          { missionId: id },
+          token,
+        );
+        if (!alive.current) return;
+        applyProgress(data);
+        savePending(pendingRef.current.filter((value) => value !== id));
+        setProgressError("");
+        setNotice(
+          data.awardedXP
+            ? `${data.mission.title} completed! +${data.awardedXP} XP saved.`
+            : `${data.mission.title}: today's XP was already claimed. Thanks for playing again!`,
+        );
+      }
+    } catch (error) {
+      if (alive.current)
+        setProgressError(
+          `${error.message} Your mission reward is pending; retry below.`,
+        );
+    } finally {
+      draining.current = false;
+      if (alive.current) setClaimingRewards(false);
+    }
+  }
+
+  useEffect(() => {
+    alive.current = true;
+    setProgressLoaded(false);
+    // Historical browser-only XP stays untouched in its original localStorage key.
+    // Only server-issued rewards can fund the new wallet.
+    try {
+      const saved = JSON.parse(localStorage.getItem(pendingKey) || "[]");
+      pendingRef.current = Array.isArray(saved)
+        ? [
+            ...new Set(
+              saved.filter((id) => Number.isInteger(id) && id >= 1 && id <= 11),
+            ),
+          ]
+        : [];
+      setPendingClaims(pendingRef.current);
+    } catch {
+      pendingRef.current = [];
+    }
+    refreshProgress().then(() => {
+      if (alive.current) drainClaims();
+    });
+    const sync = () => {
+      if (document.visibilityState === "visible" && !draining.current)
+        refreshProgress();
+    };
+    window.addEventListener("focus", sync);
+    document.addEventListener("visibilitychange", sync);
+    const timer = window.setInterval(sync, 60000);
+    return () => {
+      alive.current = false;
+      clearInterval(timer);
+      window.removeEventListener("focus", sync);
+      document.removeEventListener("visibilitychange", sync);
+    };
+  }, [pendingKey]);
+
   useEffect(() => {
     if (!progressLoaded) return;
 
-    localStorage.setItem(
-      progressKey,
-      JSON.stringify({
-        xp,
-        missions,
-        rewards,
-        lastMissionDate: getToday(),
-      })
-    );
-  }, [xp, missions, rewards, progressLoaded, progressKey]);
+    const token = localStorage.getItem("facequest-token");
+    if (!token) return;
 
-  
-useEffect(() => {
-  if (!progressLoaded) return;
+    let cancelled = false;
 
-  const token = localStorage.getItem("facequest-token");
-  if (!token) return;
-
-  let cancelled = false;
-
-  async function checkDailyReward() {
+    async function checkDailyReward() {
       try {
         const response = await fetch(
           `${API_BASE}/api/auth/daily-reward/status`,
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
 
         const data = await response.json();
@@ -309,40 +485,35 @@ useEffect(() => {
     };
   }, [progressLoaded, accountKey]);
 
-  
-async function claimDailyReward() {
-  const token = localStorage.getItem("facequest-token");
-  if (!token || rewardLoading) return;
+  async function claimDailyReward() {
+    const token = localStorage.getItem("facequest-token");
+    if (!token || rewardLoading) return;
 
-  setRewardLoading(true);
-  setRewardError("");
+    setRewardLoading(true);
+    setRewardError("");
 
-  try {
-    const response = await fetch(
-      `${API_BASE}/api/auth/daily-reward/claim`,
-      {
+    try {
+      const response = await fetch(`${API_BASE}/api/auth/daily-reward/claim`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to claim reward.");
       }
-    );
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Unable to claim reward.");
+      await refreshProgress();
+      setDailyReward(data);
+      setRewardClaimed(true);
+      setShowDailyReward(false);
+    } catch (error) {
+      setRewardError(error.message || "Unable to claim reward.");
+    } finally {
+      setRewardLoading(false);
     }
-
-    setXp(Number(data.user.xp));
-    setDailyReward(data);
-    setRewardClaimed(true);
-    setShowDailyReward(false);
-  } catch (error) {
-    setRewardError(error.message || "Unable to claim reward.");
-  } finally {
-    setRewardLoading(false);
   }
-}
-
 
   async function openReferral() {
     const token = localStorage.getItem("facequest-token");
@@ -373,7 +544,7 @@ async function claimDailyReward() {
 
       if (!code) {
         setRewardError(
-          "Your account has no referral code yet. Please check your account in the database."
+          "Your account has no referral code yet. Please check your account in the database.",
         );
         return;
       }
@@ -384,7 +555,6 @@ async function claimDailyReward() {
     }
   }
 
-
   const completedCount = rewards.length;
   const totalMissionsCount = initialMissions.length;
   const level = Math.floor(xp / 300) + 1;
@@ -393,22 +563,18 @@ async function claimDailyReward() {
   const featuredMission = missions[0];
 
   function completeMission(mission) {
-    if (!missions.some((item) => item.id === mission.id)) {
-      return;
-    }
-
-    setMissions((current) =>
-      current.filter((item) => item.id !== mission.id)
-    );
-
-    setXp((current) => current + mission.xp);
-    setRewards((current) => [...current, mission.reward]);
-    setNotice(
-      `${mission.title} completed. +${mission.xp} XP earned. ${mission.reward} unlocked.`
-    );
+    if (!mission || !alive.current) return;
+    if (!pendingRef.current.includes(mission.id))
+      savePending([...pendingRef.current, mission.id]);
+    setNotice("Mission completed. Saving your XP…");
+    drainClaims();
   }
 
   function startMission(mission) {
+    if (!progressLoaded) {
+      setProgressError("Load your XP balance before starting a mission.");
+      return;
+    }
     if (mission.type === "camera") {
       setActiveCameraMission(mission);
       setShowCamera(true);
@@ -460,7 +626,7 @@ async function claimDailyReward() {
       setShowFrontierExplorer(true);
       return;
     }
-    
+
     if (mission.id === 3) {
       setShowPortalRestoration(true);
       return;
@@ -471,7 +637,9 @@ async function claimDailyReward() {
 
   function replayMissions() {
     setMissions(initialMissions);
-    setNotice("Missions restored. Ready for another run.");
+    setNotice(
+      "Practice missions restored. Each mission awards XP once per UTC day; replays do not award extra XP.",
+    );
   }
 
   if (showCrystalPuzzle) {
@@ -481,21 +649,8 @@ async function claimDailyReward() {
           setShowCrystalPuzzle(false);
           setActiveGameMission(null);
         }}
-        onComplete={(earnedXP) => {
-          const mission = activeGameMission;
-
-          if (mission) {
-            setXp((current) => current + earnedXP);
-            setRewards((current) => [
-              ...current,
-              mission.reward || "Crystal Key",
-            ]);
-            setMissions((current) =>
-              current.filter((item) => item.id !== mission.id)
-            );
-            setNotice(`${mission.title} completed! +${earnedXP} XP earned.`);
-          }
-
+        onComplete={() => {
+          completeMission(initialMissions.find((mission) => mission.id === 1));
           setShowCrystalPuzzle(false);
           setActiveGameMission(null);
         }}
@@ -507,21 +662,8 @@ async function claimDailyReward() {
     return (
       <FaceExplorerMission
         onBack={() => setShowFaceExplorer(false)}
-        onComplete={(earnedXP) => {
-          const mission = missions.find((item) => item.id === 5);
-
-          if (mission) {
-            setXp((current) => current + earnedXP);
-            setRewards((current) => [
-              ...current,
-              mission.reward || "Explorer Badge",
-            ]);
-            setMissions((current) =>
-              current.filter((item) => item.id !== 5)
-            );
-            setNotice(`Face Explorer completed! +${earnedXP} XP earned.`);
-          }
-
+        onComplete={() => {
+          completeMission(initialMissions.find((mission) => mission.id === 5));
           setShowFaceExplorer(false);
         }}
       />
@@ -532,19 +674,8 @@ async function claimDailyReward() {
     return (
       <FocusBridgeMission
         onBack={() => setShowFocusBridge(false)}
-        onComplete={(earnedXP) => {
-          const mission = missions.find((item) => item.id === 6);
-
-          if (mission) {
-            setXp((current) => current + earnedXP);
-            setRewards((current) => [
-              ...current,
-              mission.reward || "Focus Crystal",
-            ]);
-            setMissions((current) => current.filter((item) => item.id !== 6));
-            setNotice(`Focus Bridge completed! +${earnedXP} XP earned.`);
-          }
-
+        onComplete={() => {
+          completeMission(initialMissions.find((mission) => mission.id === 6));
           setShowFocusBridge(false);
         }}
       />
@@ -555,21 +686,8 @@ async function claimDailyReward() {
     return (
       <DragonsEyeMission
         onBack={() => setShowDragonsEye(false)}
-        onComplete={(earnedXP) => {
-          const mission = missions.find((item) => item.id === 7);
-
-          if (mission) {
-            setXp((current) => current + earnedXP);
-            setRewards((current) => [
-              ...current,
-              mission.reward || "Dragon Crystal",
-            ]);
-            setMissions((current) =>
-              current.filter((item) => item.id !== 7)
-            );
-            setNotice(`Dragon's Eye completed! +${earnedXP} XP earned.`);
-          }
-
+        onComplete={() => {
+          completeMission(initialMissions.find((mission) => mission.id === 7));
           setShowDragonsEye(false);
         }}
       />
@@ -580,21 +698,8 @@ async function claimDailyReward() {
     return (
       <MirrorMazeMission
         onBack={() => setShowMirrorMaze(false)}
-        onComplete={(earnedXP) => {
-          const mission = missions.find((item) => item.id === 8);
-
-          if (mission) {
-            setXp((current) => current + earnedXP);
-            setRewards((current) => [
-              ...current,
-              mission.reward || "Mirror Shard",
-            ]);
-            setMissions((current) =>
-              current.filter((item) => item.id !== 8)
-            );
-            setNotice(`Mirror Maze completed! +${earnedXP} XP earned.`);
-          }
-
+        onComplete={() => {
+          completeMission(initialMissions.find((mission) => mission.id === 8));
           setShowMirrorMaze(false);
         }}
       />
@@ -605,21 +710,8 @@ async function claimDailyReward() {
     return (
       <StarshipMission
         onBack={() => setShowStarship(false)}
-        onComplete={(earnedXP) => {
-          const mission = missions.find((item) => item.id === 9);
-
-          if (mission) {
-            setXp((current) => current + earnedXP);
-            setRewards((current) => [
-              ...current,
-              mission.reward || "Starship Badge",
-            ]);
-            setMissions((current) =>
-              current.filter((item) => item.id !== 9)
-            );
-            setNotice(`Starship Navigator completed! +${earnedXP} XP earned.`);
-          }
-
+        onComplete={() => {
+          completeMission(initialMissions.find((mission) => mission.id === 9));
           setShowStarship(false);
         }}
       />
@@ -630,21 +722,8 @@ async function claimDailyReward() {
     return (
       <LostPortraitsMission
         onBack={() => setShowLostPortraits(false)}
-        onComplete={(earnedXP) => {
-          const mission = missions.find((item) => item.id === 10);
-
-          if (mission) {
-            setXp((current) => current + earnedXP);
-            setRewards((current) => [
-              ...current,
-              mission.reward || "Royal Portrait Badge",
-            ]);
-            setMissions((current) =>
-              current.filter((item) => item.id !== 10)
-            );
-            setNotice(`Lost Portraits completed! +${earnedXP} XP earned.`);
-          }
-
+        onComplete={() => {
+          completeMission(initialMissions.find((mission) => mission.id === 10));
           setShowLostPortraits(false);
         }}
       />
@@ -655,21 +734,8 @@ async function claimDailyReward() {
     return (
       <RhythmRealmMission
         onBack={() => setShowRhythmRealm(false)}
-        onComplete={(earnedXP) => {
-          const mission = missions.find((item) => item.id === 11);
-
-          if (mission) {
-            setXp((current) => current + earnedXP);
-            setRewards((current) => [
-              ...current,
-              mission.reward || "Rhythm Crown",
-            ]);
-            setMissions((current) =>
-              current.filter((item) => item.id !== 11)
-            );
-            setNotice(`Rhythm of the Realm completed! +${earnedXP} XP earned.`);
-          }
-
+        onComplete={() => {
+          completeMission(initialMissions.find((mission) => mission.id === 11));
           setShowRhythmRealm(false);
         }}
       />
@@ -680,22 +746,8 @@ async function claimDailyReward() {
     return (
       <FrontierExplorer
         onBack={() => setShowFrontierExplorer(false)}
-        onComplete={(earnedXP) => {
-          const mission = initialMissions.find(
-            (item) => item.id === 2
-          );
-
-          if (mission && missions.some((item) => item.id === 2)) {
-            setXp((current) => current + earnedXP);
-            setRewards((current) => [...current, mission.reward]);
-            setMissions((current) =>
-              current.filter((item) => item.id !== 2)
-            );
-            setNotice(
-              `${mission.title} completed! +${earnedXP} XP earned.`
-            );
-          }
-
+        onComplete={() => {
+          completeMission(initialMissions.find((mission) => mission.id === 2));
           setShowFrontierExplorer(false);
         }}
       />
@@ -706,22 +758,8 @@ async function claimDailyReward() {
     return (
       <PortalRestoration
         onBack={() => setShowPortalRestoration(false)}
-        onComplete={(earnedXP) => {
-          const mission = initialMissions.find(
-            (item) => item.id === 3
-          );
-
-          if (mission && missions.some((item) => item.id === 3)) {
-            setXp((current) => current + earnedXP);
-            setRewards((current) => [...current, mission.reward]);
-            setMissions((current) =>
-              current.filter((item) => item.id !== 3)
-            );
-            setNotice(
-              `${mission.title} completed! +${earnedXP} XP earned.`
-            );
-          }
-
+        onComplete={() => {
+          completeMission(initialMissions.find((mission) => mission.id === 3));
           setShowPortalRestoration(false);
         }}
       />
@@ -733,35 +771,26 @@ async function claimDailyReward() {
       <CameraMission
         onBack={() => setShowCamera(false)}
         onComplete={() => {
-          const mission = activeCameraMission;
-
-          if (mission) {
-            setXp((current) => current + mission.xp);
-            setRewards((current) => [
-              ...current,
-              mission.title === "Light Seeker"
-                ? "Radiant Crystal"
-                : "Signal Fragment",
-            ]);
-            setMissions((current) =>
-              current.filter((item) => item.id !== mission.id)
-            );
-            setNotice(`${mission.title} completed! +${mission.xp} XP earned.`);
-          }
-
-          setActiveCameraMission(null);
+          completeMission(initialMissions.find((mission) => mission.id === 4));
           setShowCamera(false);
+          setActiveCameraMission(null);
         }}
       />
     );
   }
 
+  if (showGallery) {
+    return <GalleryPage onBack={() => setShowGallery(false)} />;
+  }
+
   if (showAvatarStudio) {
     return (
       <AvatarStudio
-        playerXP={xp}
-        onXPChange={(nextXP) => setXp(nextXP)}
-        onBack={() => setShowAvatarStudio(false)}
+        onWalletChange={applyWallet}
+        onBack={() => {
+          setShowAvatarStudio(false);
+          refreshProgress();
+        }}
       />
     );
   }
@@ -769,33 +798,38 @@ async function claimDailyReward() {
   if (showRedeemStore) {
     return (
       <RedeemStore
-        playerXP={xp}
-        onXPChange={(nextXP) => setXp(nextXP)}
-        onBack={() => setShowRedeemStore(false)}
+        onWalletChange={applyWallet}
+        onBack={() => {
+          setShowRedeemStore(false);
+          refreshProgress();
+        }}
       />
     );
   }
 
   return (
     <main className="dashboard sci-dashboard" id="dashboard">
-        {showDailyReward && (
-          <div className="fq-reward-overlay">
-            <section className="fq-reward-modal" role="dialog" aria-modal="true">
-              <div className="fq-reward-icon">🎁</div>
-              <p className="fq-reward-kicker">DAILY LOGIN BONUS</p>
-              <h2>Your daily reward is ready!</h2>
-              <p>Claim your reward and keep your adventure going.</p>
-              <div className="fq-reward-amount">+50 XP</div>
-              {dailyReward?.streakBonusXP > 0 && (
-                <p>Streak bonus available: +{dailyReward.streakBonusXP} XP</p>
-              )}
-              {rewardError && <p role="alert">{rewardError}</p>}
-              <button onClick={claimDailyReward} disabled={rewardLoading}>
-                {rewardLoading ? "CLAIMING..." : "CLAIM DAILY REWARD"}
-              </button>
-            </section>
-          </div>
-        )}
+      {showDailyReward && (
+        <div className="fq-reward-overlay">
+          <section className="fq-reward-modal" role="dialog" aria-modal="true">
+            <div className="fq-reward-icon">🎁</div>
+            <p className="fq-reward-kicker">DAILY LOGIN BONUS</p>
+            <h2>Your daily reward is ready!</h2>
+            <p>Claim your reward and keep your adventure going.</p>
+            <div className="fq-reward-amount">+{dailyReward?.dailyXP ?? 50} XP</div>
+            {dailyReward?.streakBonusXP > 0 && (
+              <p>Streak bonus available: +{dailyReward.streakBonusXP} XP</p>
+            )}
+            {rewardError && <p role="alert">{rewardError}</p>}
+            <button onClick={claimDailyReward} disabled={rewardLoading}>
+              {rewardLoading ? "CLAIMING..." : "CLAIM DAILY REWARD"}
+            </button>
+            <button className="fq-reward-later" type="button" onClick={() => setShowDailyReward(false)}>
+              Maybe later
+            </button>
+          </section>
+        </div>
+      )}
 
       <header className="dashboard-header sci-header">
         <div className="sci-header-left">
@@ -805,7 +839,7 @@ async function claimDailyReward() {
 
           <div className="sci-online">
             <span className="sci-online-dot" />
-            SYSTEM ONLINE
+            READY TO EXPLORE
           </div>
         </div>
 
@@ -813,15 +847,18 @@ async function claimDailyReward() {
           <div>
             FACE<span>QUEST</span>
           </div>
-          <small>EXPLORATION NETWORK</small>
+          <small>THE EXPLORER’S JOURNAL</small>
         </a>
 
         <div className="sci-header-right">
           {/* PLAYER PROFILE MENU */}
-          <div className="sci-account">
+          <div className="sci-account" ref={accountMenuRef}>
             <button
               type="button"
               className="sci-account-button"
+              ref={accountButtonRef}
+              aria-controls="fq-account-panel"
+              aria-label={`Player account: ${playerName}`}
               onClick={() => setProfileOpen((open) => !open)}
               aria-expanded={profileOpen}
             >
@@ -840,7 +877,7 @@ async function claimDailyReward() {
             </button>
 
             {profileOpen && (
-              <div className="sci-account-menu">
+              <nav className="sci-account-menu" id="fq-account-panel" aria-label="Player account">
                 <div className="sci-account-details">
                   <strong>{playerName}</strong>
                   <span>{playerEmail || "No email available"}</span>
@@ -873,14 +910,14 @@ async function claimDailyReward() {
                     setShowRedeemStore(true);
                   }}
                 >
-                  <span>🎟️</span>
+                  <span aria-hidden="true">▱</span>
                   <span>
                     <strong>Redeem Store</strong>
-                    <small>Exchange XP for coupons</small>
+                    <small>Exchange XP for demo coupons</small>
                   </span>
                   <span>→</span>
                 </button>
-                
+
                 <button
                   type="button"
                   className="sci-account-avatar-link"
@@ -896,12 +933,14 @@ async function claimDailyReward() {
                         `${API_BASE}/api/auth/daily-reward/status`,
                         {
                           headers: { Authorization: `Bearer ${token}` },
-                        }
+                        },
                       );
                       const data = await response.json();
 
                       if (!response.ok) {
-                        throw new Error(data.message || "Could not load rewards.");
+                        throw new Error(
+                          data.message || "Could not load rewards.",
+                        );
                       }
 
                       setWeeklyRewardStatus(data);
@@ -912,14 +951,14 @@ async function claimDailyReward() {
                     }
                   }}
                 >
-                  <span>🎁</span>
+                  <span aria-hidden="true">◇</span>
                   <span>
                     <strong>Daily Rewards</strong>
                     <small>Build your 7-day streak</small>
                   </span>
                   <span>→</span>
                 </button>
-                
+
                 <button
                   type="button"
                   className="sci-account-avatar-link"
@@ -929,14 +968,13 @@ async function claimDailyReward() {
                     openReferral();
                   }}
                 >
-                  <span>👥</span>
+                  <span aria-hidden="true">♧</span>
                   <span>
                     <strong>Refer a Friend</strong>
                     <small>Share your code and invite friends</small>
                   </span>
                   <span>→</span>
                 </button>
-
 
                 <button
                   type="button"
@@ -945,25 +983,80 @@ async function claimDailyReward() {
                 >
                   <span>↪</span> LOG OUT
                 </button>
-              </div>
+              </nav>
             )}
           </div>
         </div>
       </header>
 
       <div className="sci-dashboard-content">
+        <section className="fq-wallet-strip" aria-label="XP wallet">
+          <div>
+            <small>AVAILABLE TO SPEND</small>
+            <strong>
+              {progressLoaded ? availableXP.toLocaleString() : "…"} XP
+            </strong>
+          </div>
+          <p>
+            {xp.toLocaleString()} XP earned · Level {level}
+            <br />
+            Purchases keep your level. Mission XP resets daily at 00:00 UTC.
+          </p>
+          <button
+            type="button"
+            disabled={!progressLoaded}
+            onClick={() => setShowRedeemStore(true)}
+          >
+            Visit Redeem Store →
+          </button>
+        </section>
+        {progressError && (
+          <div className="fq-progress-error" role="alert">
+            {progressError}{" "}
+            <button
+              type="button"
+              onClick={() => {
+                refreshProgress();
+                drainClaims();
+              }}
+            >
+              Retry sync
+            </button>
+          </div>
+        )}
+        {!!pendingClaims.length && (
+          <div className="fq-reward-sync" role="status">
+            {pendingClaims.length} mission reward(s) pending.{" "}
+            {claimingRewards ? (
+              "Saving…"
+            ) : (
+              <button type="button" onClick={drainClaims}>
+                Retry rewards
+              </button>
+            )}
+          </div>
+        )}
+        <div className="fq-gallery-link-row">
+          <button
+            type="button"
+            className="fq-gallery-button secondary"
+            onClick={() => setShowGallery(true)}
+          >
+            ◎ My Gallery
+          </button>
+        </div>
         <section className="sci-welcome">
           <div className="sci-kicker">
             <span className="sci-kicker-line" />
-            EXPLORER COMMAND CENTER
+            YOUR EXPLORER’S JOURNAL
           </div>
 
           <div className="sci-welcome-row">
             <div>
               <h1>
-                READY TO
+                Welcome back,
                 <br />
-                <span>EXPLORE?</span>
+                <span>{playerName}.</span>
               </h1>
 
               <p>
@@ -981,7 +1074,6 @@ async function claimDailyReward() {
           </div>
         </section>
 
-        
         {showReferral && (
           <section className="fq-referral-panel">
             <h2>Refer a Friend</h2>
@@ -999,7 +1091,9 @@ async function claimDailyReward() {
                   await navigator.clipboard.writeText(referralCode);
                   setNotice("Referral code copied!");
                 } catch {
-                  setRewardError("Couldn't copy the code. Please select and copy it.");
+                  setRewardError(
+                    "Couldn't copy the code. Please select and copy it.",
+                  );
                 }
               }}
             >
@@ -1008,24 +1102,18 @@ async function claimDailyReward() {
 
             {rewardError && <p role="alert">{rewardError}</p>}
 
-            <button
-              type="button"
-              onClick={() => setShowReferral(false)}
-            >
+            <button type="button" onClick={() => setShowReferral(false)}>
               Close
             </button>
           </section>
         )}
 
-        
         {showDailyRewards && (
           <section className="fq-weekly-rewards">
             <h2>Your 7-Day Reward Streak</h2>
             <p>Miss a day and your next claim starts again at Day 1.</p>
 
-            {dailyRewardError && (
-              <p role="alert">{dailyRewardError}</p>
-            )}
+            {dailyRewardError && <p role="alert">{dailyRewardError}</p>}
 
             {dailyRewardLoading ? (
               <p>Loading rewards...</p>
@@ -1036,10 +1124,9 @@ async function claimDailyReward() {
                     const day = index + 1;
                     const currentDay = weeklyRewardStatus?.day || 1;
                     const claimedToday = weeklyRewardStatus?.claimedToday;
-                    const completed =
-                      claimedToday
-                        ? day <= currentDay
-                        : day < currentDay;
+                    const completed = claimedToday
+                      ? day <= currentDay
+                      : day < currentDay;
 
                     return (
                       <article
@@ -1047,7 +1134,7 @@ async function claimDailyReward() {
                         key={day}
                       >
                         <strong>Day {day}</strong>
-                        <span>🎁</span>
+                        <span aria-hidden="true">◇</span>
                         <b>+{amount} XP</b>
                         <small>
                           {completed
@@ -1063,10 +1150,7 @@ async function claimDailyReward() {
 
                 <button
                   type="button"
-                  disabled={
-                    dailyRewardLoading ||
-                    !weeklyRewardStatus?.canClaim
-                  }
+                  disabled={dailyRewardLoading || !weeklyRewardStatus?.canClaim}
                   onClick={async () => {
                     setDailyRewardLoading(true);
                     setDailyRewardError("");
@@ -1080,15 +1164,17 @@ async function claimDailyReward() {
                           headers: {
                             Authorization: `Bearer ${token}`,
                           },
-                        }
+                        },
                       );
                       const data = await response.json();
 
                       if (!response.ok) {
-                        throw new Error(data.message || "Could not claim reward.");
+                        throw new Error(
+                          data.message || "Could not claim reward.",
+                        );
                       }
 
-                      setXp(Number(data.user.xp));
+                      await refreshProgress();
                       setWeeklyRewardStatus({
                         canClaim: false,
                         claimedToday: true,
@@ -1096,7 +1182,9 @@ async function claimDailyReward() {
                         dailyXP: data.dailyXP,
                         loginStreak: data.user.login_streak,
                       });
-                      setNotice(`Day ${data.day} reward claimed! +${data.dailyXP} XP.`);
+                      setNotice(
+                        `Day ${data.day} reward claimed! +${data.dailyXP} XP.`,
+                      );
                     } catch (error) {
                       setDailyRewardError(error.message);
                     } finally {
@@ -1120,16 +1208,14 @@ async function claimDailyReward() {
           </section>
         )}
 
-
-
         <section className="sci-stats" aria-label="Player statistics">
           <article className="sci-stat">
             <div className="sci-stat-top">
-              <span>RANK LEVEL</span>
+              <span>YOUR LEVEL</span>
               <span className="sci-stat-symbol">◈</span>
             </div>
             <strong>{String(level).padStart(2, "0")}</strong>
-            <span className="sci-stat-caption">EXPLORER CLASS</span>
+            <span className="sci-stat-caption">GROWING WITH EVERY QUEST</span>
           </article>
 
           <article className="sci-stat">
@@ -1138,7 +1224,7 @@ async function claimDailyReward() {
               <span className="sci-stat-symbol">✧</span>
             </div>
             <strong>{xp.toLocaleString()}</strong>
-            <span className="sci-stat-caption">TOTAL XP ACQUIRED</span>
+            <span className="sci-stat-caption">LIFETIME XP EARNED</span>
           </article>
 
           <article className="sci-stat">
@@ -1166,8 +1252,10 @@ async function claimDailyReward() {
         <section className="sci-progress-panel">
           <div className="sci-progress-header">
             <div>
-              <span className="sci-section-label">PLAYER DEVELOPMENT</span>
-              <h2>Level progression</h2>
+              <span className="sci-section-label">
+                ONE LITTLE STEP AT A TIME
+              </span>
+              <h2>Your next chapter</h2>
             </div>
 
             <div className="sci-xp-number">
@@ -1201,19 +1289,21 @@ async function claimDailyReward() {
           <div className="sci-capture-symbol">◎</div>
 
           <div className="sci-capture-copy">
-            <span>OPTIONAL DATA MISSION · PROTOCOL 01</span>
-            <h2>Restore the signal</h2>
+            <span>A DIFFERENT WAY TO EXPLORE</span>
+            <h2>See the world a little differently</h2>
             <p>
-              Complete a guided camera capture, review your image, and recover a
-              rare Signal Fragment.
+              Follow a guided camera quest, review your photos, and choose the
+              moments you want to keep.
             </p>
           </div>
 
           <button
             className="sci-capture-button"
-            onClick={() => setShowCamera(true)}
+            onClick={() =>
+              startMission(initialMissions.find((mission) => mission.id === 4))
+            }
           >
-            START CAPTURE <span>↗</span>
+            Explore with your camera <span>↗</span>
           </button>
         </section>
 
@@ -1225,19 +1315,21 @@ async function claimDailyReward() {
               <div className="sci-art-ring sci-ring-two" />
               <div className="sci-art-ring sci-ring-three" />
               <div className="sci-art-core">
-                <span>{featuredMission.icon || "◈"}</span>
+                <span>
+                  <MissionSymbol id={featuredMission.id} />
+                </span>
               </div>
-              <div className="sci-art-coordinate">SECTOR 01 / 07</div>
+              <div className="sci-art-coordinate">FIELD NOTES / 01</div>
               <div className="sci-art-status">
                 <span className="sci-online-dot" />
-                SIGNAL DETECTED
+                CURIOSITY CALLING
               </div>
             </div>
 
             <div className="sci-featured-info">
               <div className="sci-kicker">
                 <span className="sci-kicker-line" />
-                PRIORITY TRANSMISSION
+                PICKED FOR YOUR NEXT ADVENTURE
               </div>
 
               <span className="sci-featured-world">
@@ -1260,11 +1352,11 @@ async function claimDailyReward() {
                 className="mission-button sci-primary-button"
                 onClick={() => startMission(featuredMission)}
               >
-                LAUNCH PRIORITY MISSION <span>↗</span>
+                Begin this quest <span>↗</span>
               </button>
 
               <span className="sci-demo-note">
-                INTERACTIVE SIMULATION · READY FOR DEPLOYMENT
+                A LITTLE CHALLENGE. A NEW DISCOVERY.
               </span>
             </div>
           </section>
@@ -1273,9 +1365,11 @@ async function claimDailyReward() {
         <section className="missions-section sci-missions">
           <div className="sci-section-heading">
             <div>
-              <span className="sci-section-label">MISSION DATABASE</span>
-              <h2>Available operations</h2>
-              <p>Select an operation to earn XP and unlock artifacts.</p>
+              <span className="sci-section-label">FOLLOW YOUR CURIOSITY</span>
+              <h2>Your next adventure</h2>
+              <p>
+                A little challenge, a new discovery, and XP to make it your own.
+              </p>
             </div>
 
             <span className="sci-remaining">{missions.length} AVAILABLE</span>
@@ -1297,7 +1391,7 @@ async function claimDailyReward() {
                 >
                   <div className="sci-card-top">
                     <div className="mission-icon sci-mission-icon">
-                      {mission.icon || "◈"}
+                      <MissionSymbol id={mission.id} />
                     </div>
                     <span className="sci-card-number">
                       OP-{String(mission.id).padStart(3, "0")}
@@ -1325,7 +1419,7 @@ async function claimDailyReward() {
                     className="mission-button sci-secondary-button"
                     onClick={() => startMission(mission)}
                   >
-                    LAUNCH OPERATION <span>→</span>
+                    Explore this quest <span>→</span>
                   </button>
                 </article>
               ))}
@@ -1343,7 +1437,7 @@ async function claimDailyReward() {
                 className="mission-button sci-primary-button"
                 onClick={replayMissions}
               >
-                RESET SIMULATION ↻
+                Play again ↻
               </button>
             </div>
           )}
@@ -1352,8 +1446,8 @@ async function claimDailyReward() {
         <section className="collection-panel sci-collection">
           <div className="sci-collection-heading">
             <div>
-              <span className="sci-section-label">PERSONAL INVENTORY</span>
-              <h2>Artifact archive</h2>
+              <span className="sci-section-label">COLLECTED ALONG THE WAY</span>
+              <h2>Your discoveries</h2>
             </div>
             <span className="sci-archive-count">{rewards.length} ITEMS</span>
           </div>
@@ -1381,9 +1475,9 @@ async function claimDailyReward() {
         </section>
 
         <footer className="sci-footer">
-          <span>FACEQUEST EXPLORATION NETWORK</span>
+          <span>FACEQUEST THE EXPLORER’S JOURNAL</span>
           <span>
-            BUILD YOUR OWN UNIVERSE <b>✦</b>
+            MAKE A LITTLE ROOM FOR ADVENTURE <b>✦</b>
           </span>
         </footer>
       </div>

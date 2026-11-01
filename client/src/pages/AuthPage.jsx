@@ -259,10 +259,6 @@ export default function AuthPage({ onSuccess }) {
               <span>↗</span>
             </button>
           </form>
-
-          <p className="auth-privacy">
-            DEMO ACCESS · NO PASSWORD IS SAVED
-          </p>
         </section>
       </section>
     </main>

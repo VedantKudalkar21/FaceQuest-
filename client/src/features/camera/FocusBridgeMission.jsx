@@ -1,4 +1,4 @@
-
+import MissionPhotoSave from "./MissionPhotoSave";
 import { useEffect, useRef, useState } from "react";
 import { FaceDetector, FilesetResolver } from "@mediapipe/tasks-vision";
 
@@ -230,7 +230,7 @@ export default function FocusBridgeMission({ onBack, onComplete }) {
                   checked={consent}
                   onChange={(e) => setConsent(e.target.checked)}
                 />
-                I agree to this demo's camera use. Images stay in memory and are not uploaded.
+                I agree to this demo's camera use. Captured photos stay in your browser during the mission. At the end, you can choose to save them to your FaceQuest account.
               </label>
               <button className="fb-button" disabled={!consent} onClick={startGame}>
                 START CROSSING
@@ -271,12 +271,12 @@ export default function FocusBridgeMission({ onBack, onComplete }) {
               </>
             )}
             {finished && (
-              <button
-                className="fb-button"
-                onClick={() => onComplete?.(reward)}
-              >
-                CLAIM {reward} XP
-              </button>
+              <MissionPhotoSave
+                captures={captures}
+                mission="focus-bridge"
+                reward={reward}
+                onComplete={onComplete}
+              />
             )}
           </div>
 

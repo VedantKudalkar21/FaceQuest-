@@ -1,4 +1,4 @@
-
+import MissionPhotoSave from "./MissionPhotoSave";
 import { useEffect, useRef, useState } from "react";
 import { FaceDetector, FilesetResolver } from "@mediapipe/tasks-vision";
 
@@ -281,7 +281,7 @@ export default function DragonsEyeMission({ onBack, onComplete }) {
             <>
               <p className="dragon-notice">
                 The game captures a frame after your face remains visible for
-                2.5 seconds. Images stay in browser memory and are not uploaded.
+                2.5 seconds. Captured photos stay in your browser during the mission. At the end, you can choose to save them to your FaceQuest account.
                 This prototype does not measure eye gaze.
               </p>
               <label className="dragon-consent">
@@ -318,12 +318,12 @@ export default function DragonsEyeMission({ onBack, onComplete }) {
           </div>
 
           {finished && (
-            <button
-              className="dragon-start"
-              onClick={() => onComplete?.(reward)}
-            >
-              CLAIM {reward} XP →
-            </button>
+            <MissionPhotoSave
+              captures={captures}
+              mission="dragons-eye"
+              reward={reward}
+              onComplete={onComplete}
+            />
           )}
         </aside>
       </div>

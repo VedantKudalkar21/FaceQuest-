@@ -1,4 +1,4 @@
-
+import MissionPhotoSave from "./MissionPhotoSave";
 import { useEffect, useRef, useState } from "react";
 import { FaceDetector, FilesetResolver } from "@mediapipe/tasks-vision";
 
@@ -305,8 +305,7 @@ export default function MirrorMazeMission({ onBack, onComplete }) {
             <>
               <p className="mirror-note">
                 This game uses face position in the camera frame to guide the beam.
-                It does not identify you or measure eye gaze. Checkpoint images
-                stay in browser memory and are not uploaded.
+                It does not identify you or measure eye gaze. Captured photos stay in your browser during the mission. At the end, you can choose to save them to your FaceQuest account.
               </p>
               <label className="mirror-consent">
                 <input
@@ -342,12 +341,12 @@ export default function MirrorMazeMission({ onBack, onComplete }) {
           </div>
 
           {finished && (
-            <button
-              className="mirror-start"
-              onClick={() => onComplete?.(reward)}
-            >
-              CLAIM {reward} XP →
-            </button>
+            <MissionPhotoSave
+              captures={captures}
+              mission="mirror-maze"
+              reward={reward}
+              onComplete={onComplete}
+            />
           )}
         </aside>
       </div>

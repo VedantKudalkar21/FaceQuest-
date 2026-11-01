@@ -1,4 +1,4 @@
-
+import MissionPhotoSave from "./MissionPhotoSave";
 import { useEffect, useRef, useState } from "react";
 import { FaceDetector, FilesetResolver } from "@mediapipe/tasks-vision";
 
@@ -326,8 +326,7 @@ export default function LostPortraitsMission({ onBack, onComplete }) {
               <p className="portraits-note">
                 Follow each pose prompt and hold still. A frame is captured
                 automatically when a face is detected at a suitable size.
-                You can review or retake it. Images stay in browser memory and
-                are not uploaded. The prompts guide head poses but do not verify
+                You can review or retake it. Captured photos stay in your browser during the mission. At the end, you can choose to save them to your FaceQuest account. The prompts guide head poses but do not verify
                 exact angles.
               </p>
               <label className="portraits-consent">
@@ -352,12 +351,12 @@ export default function LostPortraitsMission({ onBack, onComplete }) {
           <p className="portraits-status" role="status">{message}</p>
 
           {finished && (
-            <button
-              className="portraits-start"
-              onClick={() => onComplete?.(reward)}
-            >
-              CLAIM {reward} XP →
-            </button>
+            <MissionPhotoSave
+              captures={captures}
+              mission="lost-portraits"
+              reward={reward}
+              onComplete={onComplete}
+            />
           )}
         </aside>
       </div>
